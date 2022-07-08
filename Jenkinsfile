@@ -4,26 +4,26 @@
 //                docker credentials must be created on Jenkins
 // TODO: look for all instances of [] and replace all instances of 
 //       '[VARIABLE]' with actual values 
-//        e.g [GITREPO] might become https://github.com/MyName/external.git
+//        e.g https://github.com/beachedcoder/2022_7_7_internal.git might become https://github.com/MyName/external.git
 // variables:
-//      [PROJECTID]
-//      [CREDENTIALS_ID]  //id of your global docker credentials in Jenkins https://www.google.com/search?q=add+docker+credentials+Jenkins&oq=add+docker+credentials+Jenkins
-//      [GITREPO]
-//      [DOCKERID]
-//      [APPNAME]
-//      [CLUSTER_NAME] 
-//      [ZONE]. //THIS NEEDS TO CHANGE FOR THE AWS VERSION
-//      [NAMESPACE]
+//      roidtc-july2022-u260
+//      dockerhub  //id of your global docker credentials in Jenkins https://www.google.com/search?q=add+docker+credentials+Jenkins&oq=add+docker+credentials+Jenkins
+//      https://github.com/beachedcoder/2022_7_7_internal.git
+//      beachcoder
+//      internal
+//      cluster-3 
+//      us-central1-c. //THIS NEEDS TO CHANGE FOR THE AWS VERSION
+//      default
 //      the following values can be found in the yaml:
-//      [DEPLOYMENT_NAME]
-//      [CONTAINER_NAME] (name of the container to be replaced - in the template/spec section of the deployment)
+//      demo-api
+//      demo-api (name of the container to be replaced - in the template/spec section of the deployment)
 
 
 pipeline {
     agent any 
    environment {
-        registryCredential = '[CREDENTIALS_ID]'
-        imageName = '[DOCKERID]/[APPNAME]'
+        registryCredential = 'dockerhub'
+        imageName = 'beachcoder/internal'
         dockerImage = ''
         }
     stages {
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo 'Retrieving source from github' 
                 git branch: 'master',
-                    url: '[GITREPO]'
+                    url: 'https://github.com/beachedcoder/2022_7_7_internal.git'
                 echo 'Did we get the source?' 
                 sh 'ls -a'
                 echo 'install dependencies' 
@@ -75,7 +75,7 @@ pipeline {
             steps {
                 sh "rm -rf ${WORKSPACE}/kube/"
                 echo 'Get cluster credentials'
-                sh 'gcloud container clusters get-credentials [CLUSTER_NAME] --zone [ZONE] --project [PROJECTID]'
+                sh 'gcloud container clusters get-credentials cluster-3 --zone us-central1-c --project roidtc-july2022-u260'
             }
         }     
          stage('update k8s') {
@@ -88,7 +88,7 @@ pipeline {
                     }
             steps {
                 echo 'Set the image'
-                     sh "kubectl --kubeconfig=${WORKSPACE}/kube/.kube/config set image deployment/[DEPLOYMENT_NAME] [CONTAINER_NAME]=${env.imageName}:${env.BUILD_NUMBER}"
+                     sh "kubectl --kubeconfig=${WORKSPACE}/kube/.kube/config set image deployment/demo-api demo-api=${env.imageName}:${env.BUILD_NUMBER}"
             }
         }     
         stage('Remove local docker image') {
