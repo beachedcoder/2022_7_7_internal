@@ -1,0 +1,12 @@
+*.sql
+test
+node_modules
+Dockerfile
+.dockerignore
+.gitignore
+.git
+test
+tmp
+log
+yaml
+*.yaml
